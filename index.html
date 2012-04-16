@@ -1,0 +1,236 @@
+<!DOCTYPE HTML>
+<html lang="ru-RU">
+<head>
+	<meta charset="UTF-8">
+	<title>squareDeferred</title>
+	<script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="easing.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jsdeferred.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+		$(function() {
+			Deferred.define();
+
+			// make element
+			var wrap = $("#wrap"),
+				winHeight = $(window).height(),
+				winWidth = $(window).width(),
+				array = [],
+				MAX_INDEX = 60;
+
+			next(function() {
+				return makeNext(function(index) {
+					array.push($("<div>", {
+						css: {
+							position: "absolute",
+							top: (index * 10),
+							left: (index * 10),
+							height: winHeight - (index * 10),
+							width: winWidth - (index * 10),
+							border: "1px solid #" + getColor(),
+							backgroundColor: "#" + getColor(),
+							zIndex: index
+						}
+					}).appendTo("#wrap"));
+				});
+			});
+			
+			// jsDeferred
+			(function() {
+				var callee = arguments.callee;
+				
+				wait(2).
+				next(function() {
+					return story1();
+				}).
+				wait(2).
+				next(function() {
+					return story2();
+				}).
+				wait(2).
+				next(function() {
+					return story3();
+				}).
+				wait(2).
+				next(function() {
+					return story4();
+				}).
+				wait(2).
+				next(function() {
+					return story5();
+				}).
+				wait(2).
+				next(function() {
+					return story6();
+				}).
+				wait(2).
+				next(function() {
+					return story7();
+				}).
+				wait(2).
+				next(function() {
+					callee();
+				});
+				
+			})();
+
+			// stories
+			function story1() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							height: (index * 10),
+							width: (index * 10)
+						},{
+							duration: 1500,
+							specialEasing: {
+								height: 'easeInOutQuad',
+								width: 'easeInOutCubic'
+							}
+						});
+				});
+			}
+			
+			function story2() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							left: ((120 - index) * 10) - (index * 10)
+						},{
+							duration: 2000,
+							specialEasing: {
+								left: 'easeInOutQuart'
+							}
+						});
+				});
+			}
+
+			function story3() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							height: (winHeight - (index * 10)) / 2,
+							width: (winWidth - (index * 10)) / 2
+						},{
+							duration: 2000,
+							specialEasing: {
+								height: 'easeInOutQuint',
+								width: 'easeInOutSine'
+							}
+						});
+				});
+			}
+
+			function story4() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							height: index,
+							width: index
+						},{
+							duration: 1500,
+							specialEasing: {
+								height: 'easeInOutExpo',
+								width: 'easeInOutElastic'
+							}
+						});
+				});
+			}
+
+			function story5() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							top: (Math.random() * 1000),
+							left: (Math.random() * 1000),
+							height: (Math.random() * 100),
+							width: (Math.random() * 100),
+						},{
+							duration: 1500
+						});
+				});
+			}
+
+			function story6() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							top: 0,
+							left: 0,
+							height: 0,
+							width: 0
+						},{
+							duration: 2000,
+							specialEasing: {
+								height: 'easeOutBack',
+								width: 'easeOutBack'
+							}
+						});
+				});
+			}
+
+			function story7() {
+				return makeNext(function(index) {
+					$(array[index])
+						.delay(index * 10)
+						.animate({
+							top: (index * 10),
+							left: (index * 10),
+							height: winHeight - (index * 10),
+							width: winWidth - (index * 10),
+						},{
+							duration: 1500
+						});
+				});
+			}
+			
+			// animation template
+			function makeNext(fn) {
+				return (function() {
+					var index = 0,
+						d = new Deferred();
+
+					(function() {
+						var callee = arguments.callee;
+						if (index > MAX_INDEX) {
+							d.call();
+							return;
+						}
+
+						fn(index);
+
+						index++;
+						setTimeout(function() { callee(); }, 10);
+					})();
+
+					return d;
+				})();
+			}
+			
+			// make random color
+			function getColor() {
+				return "C9" + Math.floor(Math.random() * 0x59FF).toString(16);
+			}
+		});
+	</script>
+	<style type="text/css" media="screen">
+		body {
+			overflow: hidden;
+		}
+		
+		div {
+			/* 以下激重！！ */
+/*			-webkit-box-shadow: black 1px 1px 3px;
+			-webkit-border-radius: 1em;
+*/		}
+	</style>
+</head>
+<body>
+	<div id="wrap"></div>
+</body>
+</html>
